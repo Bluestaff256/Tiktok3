@@ -1,1 +1,161 @@
+<><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTok Coins • Fast</title>
+<style>
+:root{
+  --bg:#0f0f10;
+  --card:#1a1a1c;
+  --soft:#2a2a2e;
+  --accent:#fe2c55;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#fff;font-family:-apple-system,BlinkMacSystemFont,Roboto;}
+.hidden{display:none}
+.app{max-width:430px;margin:auto;padding:14px}
+.card{background:var(--card);border-radius:16px;padding:14px;margin-bottom:14px}
+input,button{width:100%;padding:10px;border-radius:10px;border:none;margin-top:8px;font-size:15px}
+input{background:#000;color:#fff;outline:none}
+button{background:var(--accent);color:#fff;font-weight:600}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.admin{display:flex;align-items:center;gap:8px;font-size:13px}
+.admin img{width:28px;height:28px;border-radius:50%;border:2px solid var(--accent);}
+.user{background:var(--card);border-radius:14px;padding:12px;}
+.preview{display:none;margin-top:12px;border-radius:14px;overflow:hidden;border:1px solid var(--soft);background:#000;}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px;}
+.pack{background:var(--card);border-radius:18px;padding:14px;border:1px solid var(--soft);text-align:center;}
+.pack.active{border:1.5px solid var(--accent)}
+.price{margin-top:6px;font-size:13px;opacity:.85}
+.custom{background:var(--card);border-radius:18px;padding:14px;margin-top:16px;}
+.row{display:flex;justify-content:space-between;align-items:center}
+.btn{background:var(--accent);border:none;color:#fff;border-radius:10px;padding:6px 14px;font-size:16px;}
+.paybar{background:var(--accent);border-radius:14px;padding:14px;text-align:center;font-weight:700;margin-top:12px;}
+.history{margin-top:18px;font-size:13px;opacity:.9}
+.sheet{position:fixed;left:0;right:0;bottom:-100%;background:#121214;border-radius:22px 22px 0 0;padding:18px;transition:.35s;}
+.sheet.show{bottom:0}
+.visa{background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;}
+.confirm{background:var(--accent);padding:14px;border-radius:14px;text-align:center;font-weight:700;}
+.err{color:#ff6b6b;font-size:12px}
+.small{text-align:center;font-size:11px;opacity:.6;margin-top:8px}
+</style>
+</head>
+<body>
 
+<!-- LOGIN -->
+<div class="app" id="login">
+  <div class="card">
+    <h3 style="text-align:center">Admin Login</h3>
+    <input id="lu" placeholder="Username">
+    <input id="lp" type="password" placeholder="Password">
+    <button id="loginBtn">Login</button>
+    <div class="err" id="le"></div>
+    <div class="small"> login • admin / 1***</div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app hidden" id="main">
+  <div class="top">
+    <b>Get TikTok Coins 25% off</b>
+    <div class="admin">
+      <img src="https://i.imgur.com/0y0y0y0.png" alt="Admin">
+      <span>Admin</span>
+    </div>
+  </div>
+
+  <div class="user">
+    <input id="username" placeholder="Enter TikTok username" onblur="loadProfile()">
+    <div class="preview" id="preview"></div>
+  </div>
+
+  <div class="grid">
+    <div class="pack" onclick="pick(70,3.65,this)">🟡 70<div class="price">$3.65</div></div>
+    <div class="pack" onclick="pick(350,18.05,this)">🟡 350<div class="price">$18.05</div></div>
+    <div class="pack" onclick="pick(700,30.05,this)">🟡 700<div class="price">$30.05</div></div>
+    <div class="pack" onclick="pick(1400,72.15,this)">🟡 1,400<div class="price">$72.15</div></div>
+    <div class="pack" onclick="pick(3500,180.50,this)">🟡 3,500<div class="price">$180.50</div></div>
+    <div class="pack" onclick="pick(7000,360.99,this)">🟡 7,000<div class="price">$360.99</div></div>
+  </div>
+
+  <div class="custom">
+    <b>Custom amount</b>
+    <div class="row">
+      <button class="btn" onclick="chg(-100)">−</button>
+      <div id="cCoins">1000 Coins</div>
+      <button class="btn" onclick="chg(100)">+</button>
+    </div>
+    <div class="price" id="cPrice">$52.00</div>
+    <div class="paybar" onclick="openPay()">Recharge</div>
+  </div>
+
+  <div class="history" id="hist"><b>Recharge history</b></div>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="visa">
+    <b>Visa</b><br>**** **** **** 4829<br>
+    Balance: <b id="bal">$900,000.00</b>
+  </div>
+  <div class="err" id="err"></div>
+  <div class="confirm" onclick="pay()">Confirm</div>
+  <div class="small">Faster</div>
+</div>
+
+<script>
+const loginEl = document.getElementById("login");
+const mainEl = document.getElementById("main");
+const lu = document.getElementById("lu");
+const lp = document.getElementById("lp");
+const le = document.getElementById("le");
+
+const loginBtn = document.getElementById("loginBtn");
+loginBtn.addEventListener("click", ()=>{
+  if(lu.value==="admin" && lp.value==="1234"){
+    loginEl.classList.add("hidden");
+    mainEl.classList.remove("hidden");
+  }else{
+    le.innerText="Invalid credentials";
+  }
+});
+
+// Get TikTok Coins 
+let coins=1000, price=52, balance=900000;
+
+function loadProfile(){
+  const u=document.getElementById("username").value.trim();
+  const preview=document.getElementById("preview");
+  if(!u) return;
+  preview.style.display="block";
+  preview.innerHTML="Loading profile...";
+  fetch("https://www.tiktok.com/oembed?url=https://www.tiktok.com/@"+encodeURIComponent(u))
+    .then(r=>r.json())
+    .then(d=>preview.innerHTML=d.html)
+    .catch(()=>preview.innerHTML="Profile not found or private");
+}
+
+function pick(c,p,e){
+  document.querySelectorAll('.pack').forEach(x=>x.classList.remove('active'));
+  e.classList.add('active');coins=c;price=p;openPay();
+}
+function chg(v){
+  coins=Math.max(100,coins+v);
+  price=(coins*0.052).toFixed(2);
+  document.getElementById("cCoins").innerText=coins+" Coins";
+  document.getElementById("cPrice").innerText="$"+price;
+}
+function openPay(){document.getElementById("err").innerText="";document.getElementById("sheet").classList.add("show")}
+function pay(){
+  const uname=document.getElementById("username").value.trim();
+  if(!uname){document.getElementById("err").innerText="Enter username";return;}
+  if(price>balance){document.getElementById("err").innerText="Insufficient balance";return;}
+  balance-=price;
+  document.getElementById("bal").innerText="$"+balance.toLocaleString(undefined,{minimumFractionDigits:2});
+  document.getElementById("hist").innerHTML=`<div>Sent +${coins} coins to @${uname} • $${price}</div>`+document.getElementById("hist").innerHTML;
+  document.getElementById("sheet").classList.remove("show");
+}
+</script>
+
+</body>
+</html>
